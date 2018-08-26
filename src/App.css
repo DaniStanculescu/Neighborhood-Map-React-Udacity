@@ -1,3 +1,9 @@
+html,body{
+  padding: 0;
+  margin:0;
+  height:100%;
+}
+
 .App {
   text-align: center;
 }
@@ -25,4 +31,99 @@
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+.left-navbar{
+  float: left;
+  width: 25vw;
+  height: 80vh;
+  background-color: #31352D;
+  margin:0,auto;
+ z-index: 2;
+ position: absolute;
+ transition: 1s;
+ left:-300px;
+}
+
+.left-navbar.activate{
+
+  transition: 1s;
+  transform: translate(300px, 0);
+}
+
+li{
+  color:#fff;
+}
+
+
+ul{
+  text-align: center;
+  margin: 0;
+  padding: 0;
+  margin-top:10%;
+}
+
+.hamburger-menu {
+    display: inline-block;
+    cursor: pointer;
+    position: relative;
+    left:10px;
+    top:10px;
+}
+
+.line1, .line2, .line3 {
+    width: 35px;
+    height: 5px;
+    background-color: #333;
+    margin: 6px 0;
+    transition: 0.4s;
+}
+
+
+
+.topbar{
+  height:60px;
+  width:100vw;
+  background-color: #595959;
+  padding: 0;
+  margin: 0;
+}
+
+.locationInput{
+  position: relative;
+  width:70%;
+  margin-top:10px;
+  padding: 11px;
+}
+
+button{
+  position: relative;
+  display: inline-block;
+  width:15%;
+  top:14px;
+  background-image: url("images/images.png");
+  height: 40px;
+  background-color: #1affff;
+  cursor: pointer;
+  background-repeat: no-repeat;
+  background-size: 35px;
+  border: 0px;
+  background-color: #ffff;
+}
+
+button:hover{
+  outline-color: blue;
+}
+
+@media screen and (max-width: 1000px){
+
+  .left-navbar{
+    width:40vw;
+  }
+}
+
+@media screen and (max-width: 600px){
+  .left-navbar{
+    width:60vw;
+  }
 }
