@@ -24,8 +24,8 @@ class App extends Component {
 
       query:'',
       myMap:{},
-      placesInfo:[]
-
+      placesInfo:[],
+      succesfullRequest:true
     }
 
 
@@ -69,6 +69,9 @@ class App extends Component {
       else {
         //Handle the error by alerting the user that the map could not be load :(
           alert("The map can't be load :((");
+          this.setState({
+            succesfullRequest:false
+          })
       }
     }
 
@@ -114,6 +117,7 @@ class App extends Component {
      data[2].forEach(data =>newData.push(data));
 
    }
+   
  if(newData.length !== 0)
 
    dataForMarkers.push({info:newData , placeName:data[0]});
@@ -229,34 +233,41 @@ handleKeyPress(target,item,e) {
       filteredLocations = showingLocations ;
 
     return (
-      <div>
-        <div className='topbar'>
-          <div className='hamburger-menu' onClick={this.slideMenu}>
-              <div className='line1'></div>
-              <div className='line2'></div>
-              <div className='line3'></div>
+      this.state.succesfullRequest?(
+        <div>
+          <div className='topbar'>
+            <div className='hamburger-menu' onClick={this.slideMenu}>
+                <div className='line1'></div>
+                <div className='line2'></div>
+                <div className='line3'></div>
+            </div>
           </div>
-        </div>
-        {/*Here we have the code for our sidebar*/}
-        <div className='left-navbar'>
-          <form>
-            <input type="text" className="locationInput" role="search"   aria-labelledby="Search For a Location" placeholder="Search for a location on the map" onChange={(event)=>this.updateQuery(event.target.value)} value={this.state.query}/>
-            <button className="search-btn"></button>
-          </form>
-          <ul>
-            {showingLocations.map((location,index) =>(
-                <li className="list-locations" key={index} area-labelledby={`View details for ${location.name}`} tabIndex="0" onKeyPress={this.handleKeyPress.bind(this,location)} onClick={this.listItem.bind(this,location)}>{location.name}</li>
+          {/*Here we have the code for our sidebar*/}
+          <div className='left-navbar'>
+            <form>
+              <input type="text" className="locationInput" role="search"   aria-labelledby="Search For a Location" placeholder="Search for a location on the map" onChange={(event)=>this.updateQuery(event.target.value)} value={this.state.query}/>
 
-            ))}
+            </form>
+            <ul>
+              {showingLocations.map((location,index) =>(
+                  <li className="list-locations" key={index} area-labelledby={`View details for ${location.name}`} tabIndex="0" onKeyPress={this.handleKeyPress.bind(this,location)} onClick={this.listItem.bind(this,location)}>{location.name}</li>
 
-          </ul>
-        </div>
-          <div className ="container" role="application" tabIndex="-1">
-              <div className = "map-container">
-                <div id="map" role='region' aria-label = 'Brasov' ></div>
-              </div>
+              ))}
+
+            </ul>
           </div>
-      </div>
+            <div className ="container" role="application" tabIndex="-1">
+                <div className = "map-container">
+                  <div id="map" role='region' aria-label = 'Brasov' ></div>
+                </div>
+            </div>
+        </div>
+
+      ):(
+          <div>Erro:The map can't be loaded :((</div>
+
+
+      )
 
     );
   }

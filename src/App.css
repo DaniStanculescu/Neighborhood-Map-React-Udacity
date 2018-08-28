@@ -100,7 +100,7 @@ ul{
   padding: 11px;
 }
 
-.search-btn{
+/*.search-btn{
   position: relative;
   display: inline-block;
   width:15%;
@@ -116,7 +116,7 @@ ul{
   border: 1px solid black;
   border-radius: 4px;
 }
-
+ */
 button:hover{
   outline-color: blue;
 }
@@ -149,7 +149,7 @@ button:hover{
   padding-top: 9px;
   color: Black;
   height: 20px;
-  font-size: 24px;
+  font-size: 18px;
   border-bottom: 2px solid #E6EAEA
 }
 
@@ -181,9 +181,9 @@ button:hover{
 
 @media screen and (max-width: 610px){
   .left-navbar{
-    width:80vw;
+    width:50vw;
   }
   .list-locations{
-    font-size: 17px;
+    font-size: 13px;
   }
 }
