@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import scriptLoader from 'react-async-script-loader'
 import './App.css';
 import GoogleMap from "react-google-map";
@@ -54,7 +53,7 @@ class App extends Component {
   }
 
   componentWillReceiveProps({isScriptLoadSucceed}){
-      console.log(this.state.placesInfo)
+
       ///First of all we have to make sure that the scripted is loaded
       if (isScriptLoadSucceed) {
         //Creating the Map
@@ -76,7 +75,7 @@ class App extends Component {
     openInfoWIndow(){
 
 
-      console.log(this.state.myMap)
+
     }
 
     updateStateWithNewInfo(info){
@@ -147,16 +146,16 @@ console.log(newData)
         let mapMarkers = new window.google.maps.Marker({
             map:this.state.myMap,
             position:marker.pos,
-            title:marker.title
+            title:marker.name,
+            animation:window.google.maps.Animation.DROP
         });
 
         let contentForInfoWindow;
 
 
-
-
-
-        let data = dataForMarkers.forEach(loc=>{
+        ///here we add the info for the infoWindow
+         dataForMarkers.forEach(loc=>{
+          //first of we need to check if the result and the marker name match to add the correct info about location
             if(loc.placeName === marker.name)
             {
               contentForInfoWindow = `<div class='infoWindowContent'>${marker.name}</div><div>${loc.info}</div>
@@ -181,6 +180,8 @@ console.log(newData)
         mapMarkers.addListener('click',function(){
           ///here we map over all infoWindows and close them all
 
+            mapMarkers.setAnimation(window.google.maps.Animation.BOUNCE);
+            setTimeout(mapMarkers.setAnimation(null),600)
             infoWindows.forEach(element => {element.close()});
             markerInfoWindow.open(map,mapMarkers)
 
@@ -192,12 +193,25 @@ console.log(newData)
 
     }
 
+    listItem =(item,event)=>{
+      let selectedMarker = markers.filter(elem => elem.title === item.name)
+
+      window.google.maps.event.trigger(selectedMarker[0],'click');
+
+    }
+
+    //To support accessibility (https://stackoverflow.com/questions/34223558/enter-key-event-handler-on-react-bootstrap-input-component?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa)
+handleKeyPress(target,item,e) {
+  if(item.charCode===13){
+   this.listItem(target,e)
+ }
+}
 
 
   render() {
 
 
-    console.log(dataForMarkers)
+
     let data = this.state.placesInfo;
     this.convertingData(data)
 
@@ -226,18 +240,18 @@ console.log(newData)
         {/*Here we have the code for our sidebar*/}
         <div className='left-navbar'>
           <form>
-            <input type="text" className="locationInput" placeholder="Search for a location on the map" onChange={(event)=>this.updateQuery(event.target.value)} value={this.state.query}/>
+            <input type="text" className="locationInput" role="search"   aria-labelledby="Search For a Location" placeholder="Search for a location on the map" onChange={(event)=>this.updateQuery(event.target.value)} value={this.state.query}/>
             <button className="search-btn"></button>
           </form>
           <ul>
             {showingLocations.map((location,index) =>(
-                <li className="list-locations" key={index} tabIndex="0">{location.name}</li>
+                <li className="list-locations" key={index} area-labelledby={`View details for ${location.name}`} tabIndex="0" onKeyPress={this.handleKeyPress.bind(this,location)} onClick={this.listItem.bind(this,location)}>{location.name}</li>
 
             ))}
 
           </ul>
         </div>
-          <div className ="container">
+          <div className ="container" role="application" tabIndex="-1">
               <div className = "map-container">
                 <div id="map" role='region' aria-label = 'Brasov' ></div>
               </div>

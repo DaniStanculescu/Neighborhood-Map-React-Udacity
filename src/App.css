@@ -177,8 +177,13 @@ button:hover{
   }
 }
 
-@media screen and (max-width: 600px){
+
+
+@media screen and (max-width: 610px){
   .left-navbar{
-    width:60vw;
+    width:80vw;
+  }
+  .list-locations{
+    font-size: 17px;
   }
 }
