@@ -5,28 +5,27 @@ import './App.css';
 import GoogleMap from "react-google-map";
 import GoogleMapLoader from "react-google-maps-loader";
 import escapeRegExp from 'escape-string-regexp';
-import sortBy from 'sort-by'
+import sortBy from 'sort-by';
+import fetchJsonp from 'fetch-jsonp'
 
-let markers = [], infoWindows = [] ,filteredLocations = [];
+let markers = [], infoWindows = [] ,filteredLocations = [] ,dataForMarkers = [];
 
 
 class App extends Component {
 
   state={
     locationsForMarkers :[
-      {name:'Black Church' ,pos:{lat:45.6408588, lng:25.587760}},
-      {name:'Coresi Mall ' ,pos:{lat:45.6727047 , lng:25.6154651}},
-      {name:'Pizzeria Bada Bing', pos:{lat:45.6333193 , lng:25.605792}},
-      {name:'Aquatic Paradise' ,pos:{lat:45.6732842 , lng:25.5866228}},
-      {name:'Roses Park' , pos:{lat:45.6406551 , lng:25.6134646}},
-      {name:'Olimpic Ice Rink', pos:{lat:45.6637484 , lng:25.6121403}},
-      {name:'City Club Restaurant', pos:{lat: 45.642714, lng:25.6311593}},
-      {name:'McDonalds' , pos:{lat:45.6335448 , lng:25.6341000}},
-      {name:'Recreational Lake' ,pos:{lat:45.6146294 , lng:25.6390334}},
-      {name:'Zoo' , pos:{lat:45.6140752 , lng:25.633124}} ],
+      {name:'Biserica Neagră' ,pos:{lat:45.6408588, lng:25.587760}},
+      {name:'Brașov Olympic Ice Rink', pos:{lat:45.6637484 , lng:25.6121403}},
+      {name:'Poiana Brașov', pos:{lat:  45.5978534, lng:25.5519401}},
+      {name:'Transilvania University of Brașov', pos:{lat:45.6451546,lng:25.588970}},
+      {name:'Strada Sforii', pos:{lat:45.6396179,lng:25.5884976}}
+
+    ],
 
       query:'',
-      myMap:{}
+      myMap:{},
+      placesInfo:[]
 
     }
 
@@ -55,11 +54,12 @@ class App extends Component {
   }
 
   componentWillReceiveProps({isScriptLoadSucceed}){
+      console.log(this.state.placesInfo)
       ///First of all we have to make sure that the scripted is loaded
       if (isScriptLoadSucceed) {
         //Creating the Map
         const map = new window.google.maps.Map(document.getElementById('map'), {
-          zoom: 15,
+          zoom: 12,
           //Giving an initial locaiton to start
           center:{lat:45.657974 ,lng: 25.601198}
         });
@@ -73,30 +73,121 @@ class App extends Component {
       }
     }
 
+    openInfoWIndow(){
+
+
+      console.log(this.state.myMap)
+    }
+
+    updateStateWithNewInfo(info){
+      this.setState({
+          placesInfo:info
+      });
+
+    }
+
+      componentDidMount(){
+        let responses = [];
+        //after all components was inserted into the DOM we will request info about locations using wikipedia api
+        ///first of all we map over out list of locations and make a call using each location name
+        this.state.locationsForMarkers.map  ((location,index)=>{
+  return fetchJsonp(`https://en.wikipedia.org/w/api.php?action=opensearch&search=${location.name}&format=json&callback=wikiCallback`)
+  .then(response => response.json()).then((responseJson) => {
+
+      responses=responseJson
+        this.setState({
+          placesInfo:responses
+        })
+  }).catch(error =>
+  console.error(error)
+  )
+});
+
+
+}
+ convertingData(data){
+
+
+   let newData = [];
+
+   if(data[2]!== undefined)
+   {
+     data[2].forEach(data =>newData.push(data));
+
+   }
+ if(newData.length !== 0)
+
+   dataForMarkers.push({info:newData , placeName:data[0]});
+/*   if(newData!==undefined)
+console.log(newData)
+*/
+
+   ///here we filter the data for our markers
+
+
+
+ }
+
     componentDidUpdate(){
       ///after all the elements are updated we can start to work
 
+
+      const map = this.state.myMap;
       //first of all we need to set all our Markers to null and empty the both arrays (markers & infoWindows)
       markers.map((marker, index) =>{
         marker.setMap(null) ;
       });
+      markers = [];
+      infoWindows = [];
 
       filteredLocations.map(marker =>{
-        let infoWindow = new window.google.maps.InfoWindow({
-            content:'Hatz Johule'
-        });
+
         ///marker = locatia pe care vom contstrui markerul
-        console.log(marker)
+
         let mapMarkers = new window.google.maps.Marker({
             map:this.state.myMap,
             position:marker.pos,
             title:marker.title
         });
 
+        let contentForInfoWindow;
+
+
+
+
+
+        let data = dataForMarkers.forEach(loc=>{
+            if(loc.placeName === marker.name)
+            {
+              contentForInfoWindow = `<div class='infoWindowContent'>${marker.name}</div><div>${loc.info}</div>
+              `
+            }
+        });
+
+
+
+
+        let markerInfoWindow = new window.google.maps.InfoWindow({
+          content:contentForInfoWindow
+        })
+
 
         ///we add the marker to the markers array
         markers.push(mapMarkers);
-        infoWindows.push(infoWindow);
+        infoWindows.push(markerInfoWindow);
+
+        ///now we have to open the infow window when a marker is clicked , but first of all
+        ///we need to close already open Markers
+        mapMarkers.addListener('click',function(){
+          ///here we map over all infoWindows and close them all
+
+            infoWindows.forEach(element => {element.close()});
+            markerInfoWindow.open(map,mapMarkers)
+
+
+          ///before adding a new  animation we need to clear the old onChange
+
+        })
       });
 
     }
@@ -104,6 +195,12 @@ class App extends Component {
 
 
   render() {
+
+
+    console.log(dataForMarkers)
+    let data = this.state.placesInfo;
+    this.convertingData(data)
+
 
     let showingLocations
     if(this.state.query){
