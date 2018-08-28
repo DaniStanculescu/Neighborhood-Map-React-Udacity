@@ -18,5 +18,7 @@
 open the file and then  down  the page where is the link for google maps  , search for the key parameter in the url and replace my key with
 
  your own 
+ 
+ *I've used Wikipedia API to get informations about locations on the map
 
 
