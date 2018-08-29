@@ -117,7 +117,7 @@ class App extends Component {
      data[2].forEach(data =>newData.push(data));
 
    }
-   
+
  if(newData.length !== 0)
 
    dataForMarkers.push({info:newData , placeName:data[0]});
@@ -142,58 +142,70 @@ console.log(newData)
       });
       markers = [];
       infoWindows = [];
+  ///first of all , before rendering the map we nee to check the succes of the succesfullRequest
+      if(this.state.succesfullRequest === true)
+      {
+        filteredLocations.map(marker =>{
 
-      filteredLocations.map(marker =>{
+          ///marker = locatia pe care vom contstrui markerul
 
-        ///marker = locatia pe care vom contstrui markerul
 
-        let mapMarkers = new window.google.maps.Marker({
-            map:this.state.myMap,
-            position:marker.pos,
-            title:marker.name,
-            animation:window.google.maps.Animation.DROP
+          let mapMarkers = new window.google.maps.Marker({
+              map:this.state.myMap,
+              position:marker.pos,
+              title:marker.name,
+              animation:window.google.maps.Animation.DROP
+          });
+
+          let contentForInfoWindow;
+
+
+          ///here we add the info for the infoWindow
+        if(dataForMarkers.length!==0)
+        {
+          dataForMarkers.forEach(loc=>{
+           //first of we need to check if the result and the marker name match to add the correct info about location
+             if(loc.placeName === marker.name)
+             {
+               contentForInfoWindow = `<div class='infoWindowContent'>${marker.name}</div><div>${loc.info}</div>
+               `
+             }
+         });
+
+        }
+        else{
+          contentForInfoWindow = `<div class='infoWindowContent'>${marker.name}</div><div>We had a problem with the server please try again later or search info manually</div>`
+        }
+
+
+
+
+          let markerInfoWindow = new window.google.maps.InfoWindow({
+            content:contentForInfoWindow
+          })
+
+
+          ///we add the marker to the markers array
+          markers.push(mapMarkers);
+          infoWindows.push(markerInfoWindow);
+
+          ///now we have to open the infow window when a marker is clicked , but first of all
+          ///we need to close already open Markers
+          mapMarkers.addListener('click',function(){
+            ///here we map over all infoWindows and close them all
+
+              mapMarkers.setAnimation(window.google.maps.Animation.BOUNCE);
+              setTimeout(mapMarkers.setAnimation(null),600)
+              infoWindows.forEach(element => {element.close()});
+              markerInfoWindow.open(map,mapMarkers)
+
+
+            ///before adding a new  animation we need to clear the old onChange
+
+          })
         });
+      }
 
-        let contentForInfoWindow;
-
-
-        ///here we add the info for the infoWindow
-         dataForMarkers.forEach(loc=>{
-          //first of we need to check if the result and the marker name match to add the correct info about location
-            if(loc.placeName === marker.name)
-            {
-              contentForInfoWindow = `<div class='infoWindowContent'>${marker.name}</div><div>${loc.info}</div>
-              `
-            }
-        });
-
-
-
-
-        let markerInfoWindow = new window.google.maps.InfoWindow({
-          content:contentForInfoWindow
-        })
-
-
-        ///we add the marker to the markers array
-        markers.push(mapMarkers);
-        infoWindows.push(markerInfoWindow);
-
-        ///now we have to open the infow window when a marker is clicked , but first of all
-        ///we need to close already open Markers
-        mapMarkers.addListener('click',function(){
-          ///here we map over all infoWindows and close them all
-
-            mapMarkers.setAnimation(window.google.maps.Animation.BOUNCE);
-            setTimeout(mapMarkers.setAnimation(null),600)
-            infoWindows.forEach(element => {element.close()});
-            markerInfoWindow.open(map,mapMarkers)
-
-
-          ///before adding a new  animation we need to clear the old onChange
-
-        })
-      });
 
     }
 
@@ -265,14 +277,10 @@ handleKeyPress(target,item,e) {
 
       ):(
           <div>Erro:The map can't be loaded :((</div>
-
-
       )
-
     );
   }
 }
-
 export default scriptLoader(
   [
   'https://maps.googleapis.com/maps/api/js?libraries=geometry&key=AIzaSyCBSLoiCMt7KAWPunSUmxPvfc9SnuJo7Ys'
