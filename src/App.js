@@ -10,6 +10,7 @@ import fetchJsonp from 'fetch-jsonp'
 let markers = [], infoWindows = [] ,filteredLocations = [] ,dataForMarkers = [];
 
 
+
 class App extends Component {
 
   state={
@@ -28,7 +29,11 @@ class App extends Component {
       succesfullRequest:true
     }
 
+    gm_authfailure(){
+      alert('Something went wrong with the key when loading the map!:(( Please try again later ')
+          console.log('Something went wrong with the key for the map while loading the map!!')
 
+    }
 
   updateQuery (query){
    this.setState({
