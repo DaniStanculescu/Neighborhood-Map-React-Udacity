@@ -21,5 +21,12 @@ open the file and then  down  the page where is the link for google maps  , sear
  
  *I've used Wikipedia API to get informations about locations on the map
 
+### How to run the project in production mode ??? #####
+	
+	-To run the app in production mode first of all you have to run in your terminal
+			`npm run build`
+	-Then run :
+		`python -m SimpleHTTPServer 8000`
+	-Now the app is running on port 8000
 	
 
